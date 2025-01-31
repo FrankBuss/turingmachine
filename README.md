@@ -27,7 +27,7 @@ This repository contains a Rust command-line tool that simulates Turing machines
 
 ## JSON Format
 
-A Turing machine JSON file must contain these fields:
+The JSON format for the Turing machines is based on [David Eck's](https://math.hws.edu/eck/js/turing-machine/TM-info.html) format, and all his example machines are also included in the `machines` folder. But I omitted `max_state` and `symbols`, because it is redundant. It must contain these fields:
 
 - **`blank`** (string, **mandatory**): The symbol representing a blank cell (e.g. `"0"` or `"#"`).
 - **`initial`** (string, **mandatory**): The initial state of the machine (e.g. `"A"`).
