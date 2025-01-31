@@ -56,3 +56,17 @@ If, at any point, the machine finds **no** applicable rule for `(currentState, c
 In the `machines` folder, you’ll find JSON files for several Turing machines, for example Busy Beaver 4:
 
 ![Busy Beaver 4](busy-beaver-4.png)
+
+The 47 millions steps of Busy Beaver 5 need about 7 seconds on my PC:
+```
+time ./target/release/tm --fast machines/busy-beaver-5.json
+...
+Steps: 47176870
+Histogram:
+  symbol: 0, count: 8191
+  symbol: 1, count: 4098
+
+real    0m7.394s
+user    0m6.539s
+sys     0m0.008s
+```
