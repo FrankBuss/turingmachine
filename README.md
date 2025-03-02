@@ -27,7 +27,7 @@ This repository contains a Rust command-line tool that simulates Turing machines
 
 ## JSON Format
 
-The JSON format for the Turing machines is based on [David Eck's](https://math.hws.edu/eck/js/turing-machine/TM-info.html) format, and all his example machines are also included in the `machines` folder. But I omitted `max_state` and `symbols`, because it is redundant. It must contain these fields:
+The JSON format for the Turing machines is based on [David Eck's](https://math.hws.edu/eck/js/turing-machine/TM-info.html) format, and all his example machines are also included in the `machines` folder. But I omitted `max_state` and `symbols`, because it is redundant. And it is in JSON5 format, which allows comments. It must contain these fields:
 
 - **`blank`** (string, **mandatory**): The symbol representing a blank cell (e.g. `"0"` or `"#"`).
 - **`initial`** (string, **mandatory**): The initial state of the machine (e.g. `"A"`).
@@ -36,7 +36,7 @@ The JSON format for the Turing machines is based on [David Eck's](https://math.h
   - **`oldSymbol`**: The tape symbol under the head; if the machine sees no matching symbol, it checks `(oldState, "*")` as a wildcard.
   - **`newSymbol`**: Symbol to write onto the tape; if this is `"*"`, it means “rewrite the same symbol.”
   - **`direction`**: `"L"` for move left, `"R"` for move right, or `"S"` for don't move.
-  - **`newState`**: The new state.
+  - **`newState`**: The new state. `"*"` uses the same old state.
 
 ### Optional Fields
 
@@ -53,9 +53,9 @@ If, at any point, the machine finds **no** applicable rule for `(currentState, c
 
 ## Examples
 
-In the `machines` folder, you’ll find JSON files for several Turing machines, for example Busy Beaver 4:
+In the `machines` folder, you’ll find JSON files for several Turing machines, for example Busy Beaver 3:
 
-![Busy Beaver 4](busy-beaver-4.png)
+![Busy Beaver 4](busy-beaver-3.png)
 
 The 47 millions steps of Busy Beaver 5 need about 7 seconds on my PC:
 ```

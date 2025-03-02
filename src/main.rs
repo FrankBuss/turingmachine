@@ -35,10 +35,10 @@ fn main() {
             process::exit(1);
         }
     };
-    let tm: Value = match serde_json::from_str(&text) {
+    let tm: Value = match json5::from_str(&text) {
         Ok(v) => v,
         Err(e) => {
-            eprintln!("Error parsing JSON in {}: {}", cli.filename, e);
+            eprintln!("Error parsing JSON5 in {}: {}", cli.filename, e);
             process::exit(1);
         }
     };
@@ -161,7 +161,7 @@ fn main() {
 
         // find rule
         let key = (state.clone(), current_symbol.clone());
-        let (mut new_symbol, direction, new_state) =
+        let (mut new_symbol, direction, mut new_state) =
             if let Some(&(ref ns, ref dir, ref st)) = transitions.get(&key) {
                 (ns.clone(), dir.clone(), st.clone())
             } else if let Some(&(ref ns, ref dir, ref st)) =
@@ -183,6 +183,9 @@ fn main() {
 
         if new_symbol == "*" {
             new_symbol = current_symbol.clone();
+        }
+        if new_state == "*" {
+            new_state = state.clone();
         }
         tape[pos_u] = new_symbol;
         state = new_state;
