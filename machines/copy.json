@@ -14,7 +14,7 @@
         // if at end, halt
         ["init", "#", "#", "R", "HALT"],
 
-        // mark current bit as in progress with @
+        // mark current bit as in progress with x
         ["init", "0", "x", "R", "write0"],
         ["init", "1", "x", "R", "write1"],
 

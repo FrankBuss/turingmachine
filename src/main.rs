@@ -82,6 +82,9 @@ fn main() {
                     let direction = to_str(&arr[3]).to_uppercase();
                     let new_state = to_str(&arr[4]);
                     transitions.insert((old_state, old_symbol), (new_symbol, direction, new_state));
+                } else {
+                    eprintln!("Error: transition rule must have 5 elements");
+                    process::exit(1);
                 }
             }
         }
