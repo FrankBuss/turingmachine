@@ -5,7 +5,7 @@
     "date": "2025",
     "blank": "#",
     "initial": "start",
-    "tape": "0010-0000-0000-0001-0000-1101-0000-0000-0000-0000-0000-0000-0000-0000-0000-0000-0000-0000-0000",
+    "tape": "0010-0000-0000-p0001- 0000- 1101- 0000- 0000- 0000- 0000- 0000- 0000- 0000- 0000- 0000- 0000- 0000- 0000- 0000",
     "transitions": [
         // copy position specified at first word, to second word
 
@@ -54,7 +54,8 @@
         ["copy", "-", "+", "R", "copy2"],
         // move to marked word in RAM
         ["copy2", "*", "*", "R", "*"],
-        ["copy2", "+", "*", "R", "copy3"],
+        ["copy2", "+", "*", "R", "copy2b"],
+        ["copy2b", "p ", "*", "R", "copy3"],
         // set bit marker
         ["copy3", "0", "o", "L", "copy4-0"],
         ["copy3", "1", "i", "L", "copy4-1"],
