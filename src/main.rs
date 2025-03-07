@@ -77,11 +77,36 @@ fn main() {
             if let Some(arr) = rule.as_array() {
                 if arr.len() == 5 {
                     let old_state = to_str(&arr[0]);
-                    let old_symbol = to_str(&arr[1]);
+                    let old_symbol_group = to_str(&arr[1]);
                     let new_symbol = to_str(&arr[2]);
                     let direction = to_str(&arr[3]).to_uppercase();
                     let new_state = to_str(&arr[4]);
-                    transitions.insert((old_state, old_symbol), (new_symbol, direction, new_state));
+
+                    // Check that new_symbol is a single character or wildcard
+                    if new_symbol != "*" && new_symbol.chars().count() != 1 {
+                        eprintln!(
+                            "Error: new_symbol must be a single character or '*', got '{}'",
+                            new_symbol
+                        );
+                        process::exit(1);
+                    }
+
+                    // Handle multiple symbols in old_symbol_group
+                    if old_symbol_group == "*" {
+                        // Wildcard case - just add as is
+                        transitions.insert(
+                            (old_state, old_symbol_group),
+                            (new_symbol, direction, new_state),
+                        );
+                    } else {
+                        // For each character in the old_symbol_group, create a separate transition
+                        for c in old_symbol_group.chars() {
+                            transitions.insert(
+                                (old_state.clone(), c.to_string()),
+                                (new_symbol.clone(), direction.clone(), new_state.clone()),
+                            );
+                        }
+                    }
                 } else {
                     eprintln!("Error: transition rule must have 5 elements");
                     process::exit(1);
