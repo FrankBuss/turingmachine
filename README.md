@@ -33,8 +33,8 @@ The JSON format for the Turing machines is based on [David Eck's](https://math.h
 - **`initial`** (string, **mandatory**): The initial state of the machine (e.g. `"A"`).
 - **`transitions`** (array, **mandatory**): Each element is `[ oldState, oldSymbol, newSymbol, direction, newState ]`.
   - **`oldState`**: The current state.
-  - **`oldSymbol`**: The tape symbol under the head; if the machine sees no matching symbol, it checks `(oldState, "*")` as a wildcard.
-  - **`newSymbol`**: Symbol to write onto the tape; if this is `"*"`, it means “rewrite the same symbol.”
+  - **`oldSymbol`**: The tape symbol under the head; can be a single character or multiple characters to match any of them. If the machine sees no matching symbol, it checks `(oldState, "*")` as a wildcard.
+  - **`newSymbol`**: Symbol to write onto the tape; if this is `"*"`, it means "rewrite the same symbol." Must be a single character or the wildcard.
   - **`direction`**: `"L"` for move left, `"R"` for move right, or `"S"` for don't move.
   - **`newState`**: The new state. `"*"` uses the same old state.
 
@@ -53,7 +53,7 @@ If, at any point, the machine finds **no** applicable rule for `(currentState, c
 
 ## Examples
 
-In the `machines` folder, you’ll find JSON files for several Turing machines, for example Busy Beaver 3:
+In the `machines` folder, you'll find JSON files for several Turing machines, for example Busy Beaver 3:
 
 ![Busy Beaver 4](busy-beaver-3.png)
 
@@ -62,11 +62,12 @@ The 47 millions steps of Busy Beaver 5 need about 7 seconds on my PC:
 time ./target/release/tm --fast machines/busy-beaver-5.json
 ...
 Steps: 47176870
+Number of transitions: 10
 Histogram:
   symbol: 0, count: 8191
   symbol: 1, count: 4098
 
-real    0m7.394s
-user    0m6.539s
-sys     0m0.008s
+real    0m7.167s
+user    0m6.374s
+sys     0m0.016s
 ```
