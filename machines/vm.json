@@ -1,0 +1,83 @@
+{
+    "name": "VM",
+    "description": "VM test.",
+    "author": "Frank Buss",
+    "date": "2025",
+    "blank": "#",
+    "initial": "start",
+    "tape": "0010-0000-0001-0000-1101-0000-0000-0000-0000-0000-0000-0000-0000-0000-0000-0000-0000-0000",
+    "transitions": [
+        // copy position specified at first word, to second word
+
+        // first mark the RAM start with +, and move back to end of address
+        ["start", "*", "*", "R", "*"],
+        ["start", "-", "*", "R", "start2"],
+        ["start2", "*", "*", "R", "*"],
+        ["start2", "-", "+", "L", "start3"],
+        ["start3", "*", "*", "L", "*"],
+        ["start3", "-", "*", "L", "test"],
+
+        // then check if counter is zero
+        ["test", "0", "*", "L", "*"],
+        ["test", "1", "*", "L", "test2"],
+        ["test", "#", "*", "R", "copy"],
+        ["test2", "*", "*", "R", "*"],
+        ["test2", "-", "*", "L", "dec"],
+
+        // if not decrement counter
+        ["dec", "0", "1", "L", "carry"],
+        ["dec", "1", "0", "L", "dec2"],
+        ["dec", "#", "*", "R", "dec2"],
+        ["carry", "0", "1", "L", "carry"],
+        ["carry", "1", "0", "L", "dec2"],
+        ["carry", "#", "#", "L", "dec2"],
+        ["dec2", "*", "*", "R", "*"],
+        ["dec2", "-", "*", "L", "move"],
+
+        // and then move + marker
+        ["move", "*", "*", "R", "*"],
+        ["move", "+", "-", "R", "move2"],
+        ["move2", "*", "*", "R", "*"],
+        ["move2", "-", "+", "L", "move3"],
+        ["move3", "*", "*", "L", "*"],
+        ["move3", "#", "*", "R", "move4"],
+        ["move4", "*", "*", "R", "*"],
+        ["move4", "-", "*", "L", "test"],
+
+        // copy word after + marker to second word, head is at tape start
+        // first mark start of second word also with +
+        ["copy", "*", "*", "R", "*"],
+        ["copy", "-", "+", "R", "copy2"],
+        // move to marked word in RAM
+        ["copy2", "*", "*", "R", "*"],
+        ["copy2", "+", "*", "R", "copy3"],
+        // set bit marker
+        ["copy3", "0", "o", "L", "copy4-0"],
+        ["copy3", "1", "i", "L", "copy4-1"],
+        ["copy3", "o", "*", "R", "*"],
+        ["copy3", "i", "*", "R", "*"],
+        ["copy3", "*", "*", "L", "copy7"],
+        // move back to first +
+        ["copy4-0", "*", "*", "L", "*"],
+        ["copy4-1", "*", "*", "L", "*"],
+        ["copy4-0", "+", "*", "L", "copy5-0"],
+        ["copy4-1", "+", "*", "L", "copy5-1"],
+        ["copy5-0", "*", "*", "L", "*"],
+        ["copy5-1", "*", "*", "L", "*"],
+        ["copy5-0", "+", "*", "R", "copy6-0"],
+        ["copy5-1", "+", "*", "R", "copy6-1"],
+        // move right to first bit which was not copied so far and set new bit marker
+        ["copy6-0", "*", "*", "R", "*"],
+        ["copy6-1", "*", "*", "R", "*"],
+        ["copy6-0", "0", "o", "R", "copy2"],
+        ["copy6-1", "0", "i", "R", "copy2"],
+        ["copy6-0", "1", "o", "R", "copy2"],
+        ["copy6-1", "1", "i", "R", "copy2"],
+
+        // restore bits from markers
+        ["copy7", "*", "*", "L", "*"],
+        ["copy7", "o", "0", "L", "*"],
+        ["copy7", "i", "1", "L", "*"],
+        ["copy7", "#", "*", "R", "halt"]
+    ]
+}
