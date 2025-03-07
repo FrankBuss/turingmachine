@@ -225,6 +225,7 @@ fn main() {
 
     println!("\nFinal tape: {}", final_tape);
     println!("Steps: {}", step);
+    println!("Number of transitions: {}", transitions.len());
 
     // print histogram
     let mut histogram: HashMap<String, i64> = HashMap::new();
