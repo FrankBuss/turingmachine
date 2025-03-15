@@ -161,6 +161,7 @@ fn main() {
     let fast_mode = cli.fast;
     let mut step = 0_i64;
     let mut state = initial.to_string();
+    let mut outputs = Vec::new();
 
     loop {
         let do_print = if fast_mode { step % 100_000 == 0 } else { true };
@@ -215,6 +216,34 @@ fn main() {
         if new_state == "*" {
             new_state = state.clone();
         }
+        if new_state == "output" && state != "output" {
+            // special handling:
+            // start of tape looks like this: 1111-0000-....
+            // with # as blank left of it, if there
+            // extract the second binary word
+            // first get index of first -
+            let mut first = 0;
+            for (i, sym) in tape.iter().enumerate() {
+                if sym == "-" {
+                    first = i;
+                    break;
+                }
+            }
+            // then get index of second -
+            let mut second = 0;
+            for (i, sym) in tape.iter().enumerate().skip(first + 1) {
+                if sym == "-" {
+                    second = i;
+                    break;
+                }
+            }
+            // then extract the binary word
+            let mut word = String::new();
+            for sym in tape.iter().skip(first + 1).take(second - first - 1) {
+                word.push_str(sym);
+            }
+            outputs.push(word);
+        }
         tape[pos_u] = new_symbol;
         state = new_state;
 
@@ -248,7 +277,8 @@ fn main() {
         final_tape.drain(cut..);
     }
 
-    println!("\nFinal tape: {}", final_tape);
+    println!("\nInitial tape: {}", tape_str);
+    println!("Final tape: {}", final_tape);
     println!("Steps: {}", step);
     println!("Number of transitions: {}", transitions.len());
 
@@ -260,6 +290,27 @@ fn main() {
     println!("Histogram:");
     for (sym, count) in histogram {
         println!("  symbol: {}, count: {}", sym, count);
+    }
+
+    if outputs.len() > 0 {
+        println!("Outputs:");
+        for (i, word) in outputs.iter().enumerate() {
+            println!("  {}: {}", i + 1, word);
+        }
+
+        // print as ASII values, assume 8 bit words
+        println!("Outputs as ASCII:");
+        for (i, word) in outputs.iter().enumerate() {
+            let mut byte = 0;
+            for (k, c) in word.chars().enumerate() {
+                if c == '1' {
+                    byte |= 1 << (7 - k);
+                }
+            }
+            let ascii = byte as u8 as char;
+            print!("{}", ascii);
+        }
+        println!()
     }
 }
 

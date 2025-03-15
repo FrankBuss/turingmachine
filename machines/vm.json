@@ -4,9 +4,83 @@
     "author": "Frank Buss",
     "date": "2025",
     "blank": "#",
-    "initial": "start",
-    "tape": "0010-0000-0000-p0001- 0000- 1101- 0000- 0000- 0000- 0000- 0000- 0000- 0000- 0000- 0000- 0000- 0000- 0000- 0000",
+    "initial": "dtest",
+    "tape": "00000000-00000000-00000000-p00000000- 00101010- 00001110- 00000001- 00001111",
     "transitions": [
+        // move to next instruction
+        ["dtest", "*", "*", "R", "*"],
+        ["dtest", "p", "*", "R", "dtest2"],
+        ["dtest2", "*", "*", "R", "*"],
+        ["dtest2", "-", "*", "L", "decode"],
+
+        // start at right end of word
+        // decode 4 bit instruction
+        ["decode", "0", "*", "L", "d0"],
+        ["decode", "1", "*", "L", "d1"],
+        ["d0", "0", "*", "L", "d00"],
+        ["d1", "1", "*", "L", "d11"],
+        ["d0", "1", "*", "L", "d10"],
+        ["d1", "0", "*", "L", "d01"],
+        ["d00", "0", "*", "L", "d000"],
+        ["d01", "0", "*", "L", "d001"],
+        ["d10", "0", "*", "L", "d010"],
+        ["d11", "0", "*", "L", "d011"],
+        ["d00", "1", "*", "L", "d100"],
+        ["d01", "1", "*", "L", "d101"],
+        ["d10", "1", "*", "L", "d110"],
+        ["d11", "1", "*", "L", "d111"],
+        ["d000", "0", "*", "L", "loada"],
+        ["d001", "0", "*", "L", "a2x"],
+        ["d010", "0", "*", "L", "x2a"],
+        ["d011", "0", "*", "L", "a2p"],
+        ["d100", "0", "*", "L", "read"],
+        ["d101", "0", "*", "L", "write"],
+        ["d110", "0", "*", "L", "add"],
+        ["d111", "0", "*", "L", "lshift"],
+        ["d000", "1", "*", "L", "rshift"],
+        ["d001", "1", "*", "L", "and"],
+        ["d010", "1", "*", "L", "or"],
+        ["d011", "1", "*", "L", "not"],
+        ["d100", "1", "*", "L", "jump"],
+        ["d101", "1", "*", "L", "jumpz"],
+        ["d110", "1", "*", "L", "output"],
+        ["d111", "1", "*", "L", "halt"],
+
+        // write next thing to do at empty cell left to tape start
+        ["loada", "*", "*", "L", "*"],
+        ["loada", "#", "a", "R", "move-p+"],
+        ["a2x", "*", "*", "L", "*"],
+        ["a2x", "#", "d", "R", "halt"],
+        ["output", "*", "*", "L", "*"],
+        ["output", "#", "d", "R", "move-p"],
+
+        // move p to next word
+        ["move-p", "*", "*", "R", "*"],
+        ["move-p", "p", " ", "R", "move-p2"],
+        ["move-p2", "*", "*", "R", "*"],
+        ["move-p2", " ", "p", "L", "next"],
+
+        // move p to next word and mark it with +
+        ["move-p+", "*", "*", "R", "*"],
+        ["move-p+", "p", " ", "R", "move-p+2"],
+        ["move-p+2", "*", "*", "R", "*"],
+        ["move-p+2", " ", "p", "L", "move-p+3"],
+        ["move-p+3", "-", "+", "L", "next"],
+
+        // move back to next task to do
+        ["next", "*", "*", "L", "*"],
+
+        // loada microcode
+        ["next", "a", "b", "R", "copy"],  // copy word marked with + to "a" reg
+        ["next", "b", "c", "R", "move-p"],  // move p to next word
+        ["next", "c", "#", "R", "dtest"],  // next instruction
+
+        // a2x microcode
+//        TODO
+        
+        // output microcode
+        ["next", "d", "#", "R", "dtest"],  // next instruction
+
         // copy position specified at first word, to second word
 
         // first mark the RAM start with +, and move back to end of address
@@ -84,6 +158,6 @@
         ["copy7", "o", "0", "L", "*"],
         ["copy7", "i", "1", "L", "*"],
         ["copy7", "+", "-", "L", "*"],
-        ["copy7", "#", "*", "R", "halt"]
+        ["copy7", "#", "*", "R", "next"]
     ]
 }
