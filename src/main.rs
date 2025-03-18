@@ -300,11 +300,11 @@ fn main() {
 
         // print as ASII values, assume 8 bit words
         println!("Outputs as ASCII:");
-        for (i, word) in outputs.iter().enumerate() {
+        for word in outputs.iter() {
             let mut byte = 0;
-            for (k, c) in word.chars().enumerate() {
-                if c == '1' {
-                    byte |= 1 << (7 - k);
+            for (k, c) in word.chars().rev().enumerate() {
+                if k < 8 && c == '1' {
+                    byte |= 1 << k;
                 }
             }
             let ascii = byte as u8 as char;
