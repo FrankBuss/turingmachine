@@ -1,8 +1,13 @@
 use std::collections::HashMap;
 use std::fs;
+use std::io::{self, Result, Write};
 use std::process;
 
 use clap::Parser;
+use crossterm::{
+    execute,
+    style::{Attribute, Print, SetAttribute},
+};
 use serde_json::Value;
 
 #[derive(Parser)]
@@ -21,11 +26,7 @@ struct Cli {
     filename: String,
 }
 
-// ANSI codes for inverse video and reset
-const INVERSE: &str = "\u{001B}[7m";
-const RESET: &str = "\u{001B}[0m";
-
-fn main() {
+fn main() -> Result<()> {
     // parse command line and read file
     let cli = Cli::parse();
     let text = match fs::read_to_string(&cli.filename) {
@@ -163,25 +164,38 @@ fn main() {
     let mut state = initial.to_string();
     let mut outputs = Vec::new();
 
+    let mut stdout = io::stdout();
+
     loop {
         let do_print = if fast_mode { step % 100_000 == 0 } else { true };
 
         if do_print {
             let pos_u = position as usize;
-            let mut joined_tape = String::new();
+
+            // Print step, state, position information
+            print!(
+                "Step {:6}  State={:<8} Pos={:<5} Tape=",
+                step, state, position
+            );
+            stdout.flush()?;
+
+            // Print tape with current position highlighted using crossterm
             for (i, sym) in tape.iter().enumerate() {
                 if i == pos_u {
-                    joined_tape.push_str(INVERSE);
-                    joined_tape.push_str(sym);
-                    joined_tape.push_str(RESET);
+                    // Highlight current position with reverse video
+                    execute!(
+                        stdout,
+                        SetAttribute(Attribute::Reverse),
+                        Print(sym),
+                        SetAttribute(Attribute::Reset)
+                    )?;
                 } else {
-                    joined_tape.push_str(sym);
+                    // Print normal symbols
+                    execute!(stdout, Print(sym))?;
                 }
             }
-            println!(
-                "Step {:6}  State={:<8} Pos={:<5} Tape={}",
-                step, state, position, joined_tape
-            );
+            // End the line
+            println!();
         }
 
         // current symbol
@@ -292,13 +306,13 @@ fn main() {
         println!("  symbol: {}, count: {}", sym, count);
     }
 
-    if outputs.len() > 0 {
+    if !outputs.is_empty() {
         println!("Outputs:");
         for (i, word) in outputs.iter().enumerate() {
             println!("  {}: {}", i + 1, word);
         }
 
-        // print as ASII values, assume 8 bit words
+        // print as ASCII values, assume 8 bit words
         println!("Outputs as ASCII:");
         for word in outputs.iter() {
             let mut byte = 0;
@@ -312,6 +326,8 @@ fn main() {
         }
         println!()
     }
+
+    Ok(())
 }
 
 /// Converts a serde_json::Value to a string, removing surrounding quotes

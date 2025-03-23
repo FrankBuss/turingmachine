@@ -35,6 +35,7 @@ jobs:
         mkdir ${{ matrix.archive_name }}
         cp README.md ${{ matrix.archive_name }}
         cp LICENSE ${{ matrix.archive_name }}
+        cp busy-beaver-3.png ${{ matrix.archive_name }}
         cp vm.py ${{ matrix.archive_name }}
         cp test.asm ${{ matrix.archive_name }}
         cp test2.asm ${{ matrix.archive_name }}
@@ -81,6 +82,7 @@ jobs:
           mkdir tm-macos-universal
           cp README.md tm-macos-universal
           cp LICENSE tm-macos-universal
+          cp busy-beaver-3.png tm-macos-universal
           cp vm.py tm-macos-universal
           cp test.asm tm-macos-universal
           cp test2.asm tm-macos-universal
