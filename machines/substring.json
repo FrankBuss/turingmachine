@@ -1,0 +1,73 @@
+{
+    "name": "Substring",
+    "description": "Tests if the first string is a substring of the second string, and halts with true or false.",
+    "author": "Frank Buss",
+    "initial": "start",
+    "blank": "#",
+    "tape": "101#11010",  // true, substring in center
+    //"tape": "101#1010",  // true, substring at start
+    //"tape": "101#1101",  // true, substring at end
+    //"tape": "111#11010",  // false, substring not found
+    //"tape": "110101#11010",  // false, substring too long
+    //"tape": "101#11110",  // false, full text ends before substring full match
+    "transitions": [
+        // read bit to compare
+        ["start", "0", "o", "R", "skip0"],  // mark bit so that it doesn't get tested again
+        ["start", "1", "i", "R", "skip1"],
+        ["start", "o", "*", "R", "*"],  // skip already tested bits
+        ["start", "i", "*", "R", "*"],
+        ["start", "#", "*", "R", "true"],  // if no more bits to test, then it is a substring
+
+        // skip to separator
+        ["skip0", "*", "*", "R", "*"],
+        ["skip0", "#", "*", "R", "find0"],
+        ["skip1", "*", "*", "R", "*"],
+        ["skip1", "#", "*", "R", "find1"],
+
+        // find start of full text
+        ["find0", "*", "*", "R", "scan0"],
+        ["find0", "0", "o", "R", "next"],  // if match, test next bit
+        ["find0", "1", "*", "R", "erase"],  // if not match, erase bit and start full compare from next bit
+        ["find0", "#", "*", "R", "*"],  // can be more than one separator
+        ["find1", "*", "*", "R", "scan1"],
+        ["find1", "0", "*", "R", "erase"],
+        ["find1", "1", "i", "R", "next"],
+        ["find1", "#", "*", "R", "*"],
+
+        // scan within full text
+        ["scan0", "*", "*", "R", "*"],
+        ["scan0", "0", "o", "R", "next"],  // if match, test next bit
+        ["scan0", "1", "*", "R", "erase"],  // if not match, erase bit and start full compare from next bit
+        ["scan0", "#", "*", "R", "false"],  // no more bits to test
+        ["scan1", "*", "*", "R", "*"],
+        ["scan1", "0", "*", "R", "erase"],
+        ["scan1", "1", "i", "R", "next"],
+        ["scan1", "#", "*", "R", "false"],
+
+        // go back to tape start
+        ["next", "*", "*", "L", "next2"],  // go back to character in the full string
+        ["next2", "*", "*", "L", "*"],
+        ["next2", "#", "*", "L", "next3"],  // separator found
+        ["next3", "#", "*", "L", "*"],  // can be multiple blanks
+        ["next3", "*", "*", "L", "next4"],  // non-blank found, scan search string until the start
+        ["next4", "*", "*", "L", "next4"],
+        ["next4", "#", "*", "R", "start"],  // we are at start now, test next bit
+
+        // erase first bit of full string, and restore all bits from markers
+        ["erase", "#", "*", "R", "false"],  // if no more bits in full string, then it is not a match
+        ["erase", "*", "*", "L", "erase2"],  // otherwise go back
+        ["erase2", "o", "0", "L", "erase2"],  // restore markers
+        ["erase2", "i", "1", "L", "erase2"],
+        ["erase2", "*", "*", "L", "erase2"],  // skip 0 and 1
+        ["erase2", "#", "*", "R", "erase3"],  // separator found
+        ["erase3", "*", "#", "L", "erase4"],  // overwrite first bit of full string with blank
+        ["erase4", "#", "*", "L", "*"],  // can be multiple blanks
+        ["erase4", "*", "*", "L", "erase5"],  // non-blank found, scan search string until the start
+        ["erase4", "o", "0", "L", "erase5"],
+        ["erase4", "i", "1", "L", "erase5"],
+        ["erase5", "*", "*", "L", "erase5"],
+        ["erase5", "o", "0", "L", "erase5"],
+        ["erase5", "i", "1", "L", "erase5"],
+        ["erase5", "#", "*", "R", "start"],  // we are at start now, test next bit
+    ]
+}
