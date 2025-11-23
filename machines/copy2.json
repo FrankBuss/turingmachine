@@ -1,6 +1,6 @@
 {
     "name": "Binary Number Copier",
-    "description": "Copies a binary number with just 2 states, beside blank",
+    "description": "Copies a binary number with just 2 symbols, beside blank",
     "author": "Frank Buss",
     "date": "2025",
     "blank": "#",
