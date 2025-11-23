@@ -1,0 +1,82 @@
+{
+    "name": "Binary Number Copier",
+    "description": "Copies a binary number with just 2 states, beside blank",
+    "author": "Frank Buss",
+    "date": "2025",
+    "blank": "#",
+    "initial": "start",
+    "tape": "010",
+    "transitions": [
+        // we are in the input sequence, test current symbol in input sequence
+        ["start", "#", "*", "R", "halt"],
+        ["start", "0", "#", "R", "end0-0"],
+        ["start", "1", "#", "R", "end0-1"],
+
+        // search for end of input sequence
+        ["end0-0", "#", "#", "R", "seq1-0"],
+        ["end0-0", "*", "*", "R", "*"],
+        ["end0-1", "#", "#", "R", "seq1-1"],
+        ["end0-1", "*", "*", "R", "*"],
+
+        // we are now in seq1, the first copy
+        // it can be either empty at start, or have already some digits
+        ["seq1-0", "#", "#", "R", "first0-0"],
+        ["seq1-0", "*", "*", "R", "seq2-0"],
+        ["seq1-1", "#", "#", "R", "first0-1"],
+        ["seq1-1", "*", "*", "R", "seq2-1"],
+
+        // no digits so far for the second sequence, just move one empty right
+        // then set the digit for the first copy, move again right, and set the first digit for the second copy
+        ["first0-0", "*", "*", "L", "first1-0"],
+        ["first0-1", "*", "*", "L", "first1-1"],
+        ["first1-0", "*", "0", "R", "first2-0"],
+        ["first1-1", "*", "1", "R", "first2-1"],
+        ["first2-0", "*", "*", "R", "first3-0"],
+        ["first2-1", "*", "*", "R", "first3-1"],
+        ["first3-0", "*", "0", "R", "back0"],
+        ["first3-1", "*", "1", "R", "back0"],
+
+        // if there are alread digits, search the end of the first sequence, and set the next bit at the end of the first sequence
+        ["seq2-0", "#", "0", "R", "seq3-0"],
+        ["seq2-0", "*", "*", "R", "*"],
+        ["seq2-1", "#", "1", "R", "seq3-1"],
+        ["seq2-1", "*", "*", "R", "*"],
+
+        // we are now at the start of the second sequence
+        // set the empty symbol, and remember what was there
+        ["seq3-0", "0", "#", "R", "seq4-0-0"],
+        ["seq3-0", "1", "#", "R", "seq4-1-0"],
+        ["seq3-1", "0", "#", "R", "seq4-0-1"],
+        ["seq3-1", "1", "#", "R", "seq4-1-1"],
+
+        // inside the second sequence, shift bits one position to the right
+        ["seq4-0-0", "0", "0", "R", "seq4-0-0"],
+        ["seq4-1-0", "0", "1", "R", "seq4-0-0"],
+        ["seq4-0-1", "0", "0", "R", "seq4-0-1"],
+        ["seq4-1-1", "0", "1", "R", "seq4-0-1"],
+        ["seq4-0-0", "1", "0", "R", "seq4-1-0"],
+        ["seq4-1-0", "1", "1", "R", "seq4-1-0"],
+        ["seq4-0-1", "1", "0", "R", "seq4-1-1"],
+        ["seq4-1-1", "1", "1", "R", "seq4-1-1"],
+        ["seq4-0-0", "#", "0", "R", "seq5-0"],
+        ["seq4-1-0", "#", "1", "R", "seq5-0"],
+        ["seq4-0-1", "#", "0", "R", "seq5-1"],
+        ["seq4-1-1", "#", "1", "R", "seq5-1"],
+
+        // we are at the end of the second sequence, set the new digit
+        ["seq5-0", "#", "0", "R", "back0"],
+        ["seq5-1", "#", "1", "R", "back0"],
+
+        // we are at the end of the 2 copies, move back to the start
+        ["back0", "*", "*", "L", "back1"],
+        ["back1", "0", "*", "L", "*"],
+        ["back1", "1", "*", "L", "*"],
+        ["back1", "#", "*", "L", "back2"],
+        ["back2", "0", "*", "L", "*"],
+        ["back2", "1", "*", "L", "*"],
+        ["back2", "#", "*", "L", "back3"],
+        ["back3", "0", "*", "L", "*"],
+        ["back3", "1", "*", "L", "*"],
+        ["back3", "#", "*", "R", "start"],
+    ]
+}
